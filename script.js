@@ -370,11 +370,11 @@ function resetToHome() {
 }
 // Fonction qui envoie les résultats au serveur Python
 function sauvegarderResultatBDD(nom, score, total, niveau) {
-    fetch('/api/sauvegarder', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+    fetch('https://quiz-app-w965.onrender.com/api/sauvegarder', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
         body: JSON.stringify({
             nom: nom,
             score: score,

@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
@@ -8,7 +9,7 @@ CORS(app)
 
 DB_CONFIG = {
     'host': 'mysql-test-positionnement-sidji-formation.alwaysdata.net',
-    'user': '492059_admin_quiz',  # Ex: 492059_admin_quiz
+    'user': '492059_admin_quiz',
     'password': 'Azerty&19200',
     'database': 'test-positionnement-sidji-formation_quiz_db',
     'port': 3306
@@ -21,15 +22,19 @@ def sauvegarder():
     score = data.get('score')
     total = data.get('total')
     niveau = data.get('niveau')
+    reponses = data.get('reponses') # Récupère le tableau/objet des réponses
+
+    # Convertit le dictionnaire/liste en chaîne JSON
+    reponses_json = json.dumps(reponses, ensure_ascii=False) if reponses else None
 
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor()
         query = """
-            INSERT INTO resultats_apprenants (nom_apprenant, score, total_questions, niveau_estime)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO resultats_apprenants (nom_apprenant, score, total_questions, niveau_estime, reponses)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (nom, score, total, niveau))
+        cursor.execute(query, (nom, score, total, niveau, reponses_json))
         conn.commit()
         cursor.close()
         conn.close()

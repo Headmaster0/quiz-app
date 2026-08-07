@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de positionnement &amp; Intégration Civique - SIDJI Formation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. Écran de démarrage : Saisie du nom -->
+        <div id="start-container">
+            <div class="header-section">
+                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <h1>Plateforme de Positionnement &amp; Préparation Civique</h1>
+            </div>
+            <div class="card start-card">
+                <h2>Bienvenue</h2>
+                <p>Veuillez entrer votre prénom et nom pour accéder aux tests d'entraînement (10 questions par test).</p>
+                <div class="form-group">
+                    <input type="text" id="student-name" placeholder="Ex: Brandon Ouedraogo" required>
+                    <button id="start-btn" class="btn">Continuer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Écran de choix du parcours -->
+        <div id="level-selection-container" class="hidden">
+            <div class="header-section">
+                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <h1>Choix de votre objectif de formation</h1>
+                <h2>Sélectionnez un test d'entraînement (10 questions par module)</h2>
+            </div>
+
+            <!-- Section : Entraînement par Domaine de Compétence -->
+            <h3 class="section-subtitle">📌 Entraînement par Domaine de Compétence</h3>
+            <div class="level-grid skill-grid">
+                <button class="level-card skill-card" onclick="selectLevel('GRAMMAR')">
+                    <span class="level-badge badge-blue">Structure de la langue</span>
+                    <h3>Grammaire &amp; Vocabulaire</h3>
+                    <p>Conjugaison, règles syntaxiques, orthographe et réécriture (10 questions).</p>
+                </button>
+                <button class="level-card skill-card" onclick="selectLevel('READING')">
+                    <span class="level-badge badge-teal">Compréhension écrite</span>
+                    <h3>Lecture &amp; Analyse</h3>
+                    <p>Lecture de consignes, panneaux, extraits de textes et compréhension de documents (10 questions).</p>
+                </button>
+                <button class="level-card skill-card" onclick="selectLevel('CIVIC_SKILL')">
+                    <span class="level-badge badge-orange">Culture Civique &amp; Mises en situation</span>
+                    <h3>Vie Citoyenne</h3>
+                    <p>Démarches administratives, santé, démarches CAF/Préfecture et valeurs républicaines (10 questions).</p>
+                </button>
+            </div>
+
+            <!-- Section Parcours Administratifs / Formation Civique -->
+            <h3 class="section-subtitle">🎯 Démarches Administratives &amp; Intégration Civique</h3>
+            <div class="level-grid civic-grid">
+                <button class="level-card civic-card" onclick="selectLevel('CSP')">
+                    <span class="level-badge badge-red">Niveau A2 • 10 questions</span>
+                    <h3>Carte de Séjour Pluriannuelle</h3>
+                    <p>Français A2, principes fondamentaux de la République et démarches de la vie quotidienne.</p>
+                </button>
+                <button class="level-card civic-card" onclick="selectLevel('CR')">
+                    <span class="level-badge badge-purple">Niveau B1 • 10 questions</span>
+                    <h3>Carte de Résident</h3>
+                    <p>Maîtrise du français B1, institutions républicaines, droits, devoirs et mises en situation.</p>
+                </button>
+                <button class="level-card civic-card" onclick="selectLevel('NAT')">
+                    <span class="level-badge badge-darkpurple">Niveau B1/B2 • 10 questions</span>
+                    <h3>Quizz Naturalisation</h3>
+                    <p>Test approfondi : Histoire de France, société, institutions et culture générale civique.</p>
+                </button>
+            </div>
+
+            <!-- Section Niveaux de Langue CECRL -->
+            <h3 class="section-subtitle">📚 Évaluation Linguistique (CECRL)</h3>
+            <div class="level-grid">
+                <button class="level-card" onclick="selectLevel('A1')">
+                    <span class="level-badge">A1 • 10 questions</span>
+                    <h3>Débutant</h3>
+                    <p>Grammaire et vocabulaire de base.</p>
+                </button>
+                <button class="level-card" onclick="selectLevel('A2')">
+                    <span class="level-badge">A2 • 10 questions</span>
+                    <h3>Élémentaire</h3>
+                    <p>Structures courantes et situations quotidiennes.</p>
+                </button>
+                <button class="level-card" onclick="selectLevel('B1')">
+                    <span class="level-badge">B1 • 10 questions</span>
+                    <h3>Intermédiaire</h3>
+                    <p>Autonomie linguistique et compréhension de textes.</p>
+                </button>
+                <button class="level-card" onclick="selectLevel('B2')">
+                    <span class="level-badge">B2 • 10 questions</span>
+                    <h3>Avancé</h3>
+                    <p>Expression complexe, grammaire avancée et nuances.</p>
+                </button>
+                <button class="level-card level-all" onclick="selectLevel('ALL')">
+                    <span class="level-badge">A1 → B2 • 10 questions</span>
+                    <h3>Test Global TCF</h3>
+                    <p>Échantillon représentatif multiniveau.</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Écran du Quiz -->
+        <div id="quiz-container" class="hidden">
+            <div class="header-section">
+                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <h1 id="quiz-title">Quiz de Français</h1>
+            </div>
+            <div class="card">
+                <h2 id="question-text">Chargement de la question...</h2>
+                <div id="options-container" class="options-grid"></div>
+                
+                <div class="actions-group">
+                    <button id="skip-btn" class="btn btn-secondary">Je ne sais pas (Passer)</button>
+                    <button id="next-btn" class="btn">Valider la réponse</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Écran des Résultats -->
+        <div id="result-container" class="hidden">
+            <div class="header-section">
+                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <h1>Bilan &amp; Préconisation de Formation</h1>
+            </div>
+
+            <div class="results-grid">
+                <div class="left-column">
+                    <div class="card">
+                        <h3 class="card-title">Profil de l'apprenant</h3>
+                        <p id="student-info"><strong>Apprenant :</strong> --</p>
+                        <p id="selected-level-info"><strong>Objectif choisi :</strong> --</p>
+                        <p id="score-text"><strong>Score global :</strong> --</p>
+                        <p id="level-text"><strong>Résultat :</strong> --</p>
+                    </div>
+
+                    <div class="card text-center">
+                        <h3 class="card-title">Répartition des réponses</h3>
+                        <div class="donut-wrapper">
+                            <div id="donut-chart" class="donut-chart">
+                                <div id="donut-center" class="donut-center">0%</div>
+                            </div>
+                        </div>
+                        <div class="legend">
+                            <p><span class="dot green"></span> Correct : <strong id="correct-percent">0%</strong></p>
+                            <p><span class="dot red"></span> Incorrect / Omis : <strong id="incorrect-percent">0%</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="card highlight-card" id="hours-recommendation">
+                        <!-- Généré par JS -->
+                    </div>
+
+                    <div class="card" id="details-container">
+                        <!-- Généré par JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

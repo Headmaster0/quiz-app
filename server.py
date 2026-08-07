@@ -17,15 +17,22 @@ DB_CONFIG = {
 
 @app.route('/api/sauvegarder', methods=['POST'])
 def sauvegarder():
-    data = request.json
+    data = request.json or {}
+    
+    # --- LOGS DE DEBUGGING (Consulte les logs Render après un test) ---
+    print("=== DONNÉES BRUTES REÇUES DU FRONTEND ===")
+    print("JSON complet reçu :", data)
+    print("Contenu de la clé 'reponses' :", data.get('reponses'))
+    print("=========================================")
+
     nom = data.get('nom')
     score = data.get('score')
     total = data.get('total')
     niveau = data.get('niveau')
-    reponses = data.get('reponses') # Récupère le tableau/objet des réponses
+    reponses = data.get('reponses')
 
-    # Convertit le dictionnaire/liste en chaîne JSON
-    reponses_json = json.dumps(reponses, ensure_ascii=False) if reponses else None
+    # Convertit en JSON uniquement si 'reponses' n'est pas None
+    reponses_json = json.dumps(reponses, ensure_ascii=False) if reponses is not None else None
 
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
@@ -40,6 +47,7 @@ def sauvegarder():
         conn.close()
         return jsonify({'message': 'Succès'}), 200
     except Exception as e:
+        print("Erreur SQL :", str(e))
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

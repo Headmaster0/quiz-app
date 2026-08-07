@@ -789,15 +789,21 @@ function resetToHome() {
 }
 
 // Envoi des données au backend
-function sauvegarderResultatBDD(nom, score, total, niveau) {
+function sauvegarderResultatBDD(nom, score, total, niveau, reponses) {
   fetch('https://quiz-app-w965.onrender.com/api/sauvegarder', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nom: nom, score: score, total: total, niveau: niveau })
+    body: JSON.stringify({ 
+      nom: nom, 
+      score: score, 
+      total: total, 
+      niveau: niveau, 
+      reponses: reponses // <-- IL FAUT IMPÉRATIVEMENT AJOUTER CETTE LIGNE DANS L'OBJET
+    })
   })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
+      if (data.message === 'Succès' || data.success) {
         console.log('✅ Résultat enregistré en base SQL !');
       } else {
         console.error('❌ Erreur serveur :', data.error);

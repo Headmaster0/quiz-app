@@ -33,6 +33,21 @@
                 <h2>Sélectionnez un test d'entraînement (10 questions par module)</h2>
             </div>
 
+            <!-- En-tête Utilisateur / Bienvenue / Historique -->
+            <div id="user-header" class="user-header hidden">
+                <div class="welcome-banner">
+                    <h2>Bienvenue <span id="user-name-display"></span> 👋</h2>
+                    <button id="change-user-btn" class="btn-secondary">Changer d'utilisateur</button>
+                </div>
+
+                <div id="history-section" class="history-card">
+                    <h3>Vos récents résultats</h3>
+                    <div id="history-list" class="history-grid">
+                        <!-- Injecté en JS -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Section : Entraînement par Domaine de Compétence -->
             <h3 class="section-subtitle">📌 Entraînement par Domaine de Compétence</h3>
             <div class="level-grid skill-grid">
@@ -167,5 +182,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>

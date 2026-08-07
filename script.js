@@ -765,7 +765,7 @@ function showResults() {
   });
 
   // Sauvegarde vers l'API
-  sauvegarderResultatBDD(studentName, score, total, chosenTarget);
+  sauvegarderResultatBDD(studentName, score, total, chosenTarget, userAnswers);
 }
 
 // Fonction pour retourner à la sélection principale

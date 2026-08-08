@@ -1,8 +1,4 @@
 // ==========================================
-// 1. URL DE L'API (Alwaysdata)
-// ==========================================
-const API_URL = 'https://test-positionnement-sidji-formation.alwaysdata.net';
-// ==========================================
 // 1. BANQUE DE QUESTIONS (10 Q / MODULAIRE)
 // ==========================================
 const questionBank = {
@@ -231,181 +227,52 @@ function validerUtilisateur(nomSaisi) {
 }
 
 async function afficherInterfaceUtilisateur(nom) {
+  const nameDisplay = document.getElementById('user-name-display');
+  const userHeader = document.getElementById('user-header');
+  const inputContainer = document.getElementById('name-input-container');
 
-    const nameDisplay = document.getElementById('user-name-display');
-    const userHeader = document.getElementById('user-header');
-    const inputContainer = document.getElementById('name-input-container');
+  if (nameDisplay) nameDisplay.textContent = nom;
+  if (userHeader) userHeader.classList.remove('hidden');
+  if (inputContainer) inputContainer.classList.add('hidden');
+
+  if (startContainer) startContainer.classList.add('hidden');
+  if (levelSelectionContainer) levelSelectionContainer.classList.remove('hidden');
+
+  // Chargement de l'historique depuis l'API BDD
+  try {
+    const response = await fetch(`https://quiz-app-w965.onrender.com/api/historique/${encodeURIComponent(nom)}`);
+    const historique = await response.json();
+
     const historyContainer = document.getElementById('history-list');
+    if (!historyContainer) return;
 
-    // ==========================================
-    // AFFICHAGE DU NOM
-    // ==========================================
+    historyContainer.innerHTML = '';
 
-    if (nameDisplay) {
-        nameDisplay.textContent = nom;
+    if (!Array.isArray(historique) || historique.length === 0) {
+      historyContainer.innerHTML = '<p class="no-history">Aucun test effectué pour le moment.</p>';
+      return;
     }
 
-    if (userHeader) {
-        userHeader.classList.remove('hidden');
-    }
+    historique.slice(0, 3).forEach(item => {
+      const date = new Date(item.date_passage).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-    if (inputContainer) {
-        inputContainer.classList.add('hidden');
-    }
-
-    if (startContainer) {
-        startContainer.classList.add('hidden');
-    }
-
-    if (levelSelectionContainer) {
-        levelSelectionContainer.classList.remove('hidden');
-    }
-
-    // ==========================================
-    // VÉRIFICATION DU CONTENEUR HISTORIQUE
-    // ==========================================
-
-    if (!historyContainer) {
-        console.error("❌ #history-list introuvable.");
-        return;
-    }
-
-    // Message temporaire
-    historyContainer.innerHTML = `
-        <p class="no-history">
-            Chargement de votre historique...
-        </p>
-    `;
-
-    // ==========================================
-    // RÉCUPÉRATION DE L'HISTORIQUE
-    // ==========================================
-
-    try {
-
-        console.log(
-            "🔎 Recherche historique pour :",
-            nom
-        );
-
-        const url =
-            `${API_URL}/api/historique/${encodeURIComponent(nom)}`;
-
-        console.log(
-            "🌐 URL appelée :",
-            url
-        );
-
-        const response = await fetch(url);
-
-        console.log(
-            "📡 Statut HTTP :",
-            response.status
-        );
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Erreur HTTP ${response.status}`
-            );
-        }
-
-        const historique = await response.json();
-
-        console.log(
-            "📦 Historique reçu :",
-            historique
-        );
-
-        // ==========================================
-        // AUCUN RÉSULTAT
-        // ==========================================
-
-        if (
-            !Array.isArray(historique) ||
-            historique.length === 0
-        ) {
-
-            historyContainer.innerHTML = `
-                <p class="no-history">
-                    Aucun test effectué pour le moment.
-                </p>
-            `;
-
-            return;
-        }
-
-        // ==========================================
-        // AFFICHAGE
-        // ==========================================
-
-        historyContainer.innerHTML = '';
-
-        historique
-            .slice(0, 3)
-            .forEach(item => {
-
-                let date = 'Date inconnue';
-
-                if (item.date_passage) {
-
-                    const parsedDate =
-                        new Date(item.date_passage);
-
-                    if (!isNaN(parsedDate.getTime())) {
-
-                        date =
-                            parsedDate.toLocaleDateString(
-                                'fr-FR',
-                                {
-                                    day: 'numeric',
-                                    month: 'short',
-                                    year: 'numeric'
-                                }
-                            );
-                    }
-                }
-
-                const card =
-                    document.createElement('div');
-
-                card.className =
-                    'history-item';
-
-                card.innerHTML = `
-                    <span class="history-module">
-                        ${item.niveau_estime || 'Test'}
-                    </span>
-
-                    <span class="history-score">
-                        <strong>
-                            ${item.score ?? 0}
-                        </strong>
-                        /
-                        ${item.total_questions ?? 10}
-                    </span>
-
-                    <span class="history-date">
-                        ${date}
-                    </span>
-                `;
-
-                historyContainer.appendChild(card);
-            });
-
-    } catch (err) {
-
-        console.error(
-            "❌ Erreur chargement historique :",
-            err
-        );
-
-        historyContainer.innerHTML = `
-            <p class="no-history">
-                Impossible de charger votre historique.
-            </p>
-        `;
-    }
+      const card = document.createElement('div');
+      card.className = 'history-item';
+      card.innerHTML = `
+        <span class="history-module">${item.niveau_estime}</span>
+        <span class="history-score"><strong>${item.score}</strong> / ${item.total_questions}</span>
+        <span class="history-date">${date}</span>
+      `;
+      historyContainer.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Erreur chargement historique :", err);
+  }
 }
 
 // ==========================================
@@ -535,142 +402,28 @@ function processAnswer(isSkipped) {
 // ==========================================
 // 7. BDD & SAUVEGARDE
 // ==========================================
-async function sauvegarderResultatBDD(
-    nom,
-    score,
-    total,
-    niveau,
-    reponses
-) {
-
-    try {
-
-        console.log("💾 Sauvegarde du résultat...");
-
-        const response = await fetch(
-            `${API_URL}/api/sauvegarder`,
-            {
-                method: 'POST',
-
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-
-                body: JSON.stringify({
-                    nom: nom,
-                    score: score,
-                    total: total,
-                    niveau: niveau,
-                    reponses: reponses
-                })
-            }
-        );
-
-        console.log(
-            "📡 Statut sauvegarde :",
-            response.status
-        );
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Erreur HTTP ${response.status}`
-            );
-        }
-
-        const data = await response.json();
-
-        console.log(
-            "📦 Réponse sauvegarde :",
-            data
-        );
-
-        if (
-            data.message === 'Succès' ||
-            data.success === true
-        ) {
-
-            console.log(
-                "✅ Résultat enregistré en BDD."
-            );
-
-            return true;
-        }
-
-        console.error(
-            "❌ Erreur serveur :",
-            data.error
-        );
-
-        return false;
-
-    } catch (err) {
-
-        console.error(
-            "❌ Erreur sauvegarde :",
-            err
-        );
-
-        return false;
+async function sauvegarderResultatBDD(nom, score, total, niveau, reponses) {
+  try {
+    const response = await fetch('https://quiz-app-w965.onrender.com/api/sauvegarder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, score, total, niveau, reponses })
+    });
+    const data = await response.json();
+    if (data.message === 'Succès' || data.success) {
+      console.log('✅ Résultat enregistré en base SQL !');
+    } else {
+      console.error('❌ Erreur serveur :', data.error);
     }
-}// ==========================================
-// 7. BDD & SAUVEGARDE
-// ==========================================
-async function sauvegarderResultatBDD(
-    nom,
-    score,
-    total,
-    niveau,
-    reponses
-) {
-    try {
-        console.log("💾 Tentative de sauvegarde vers Alwaysdata...");
-
-        const response = await fetch(
-            `${API_URL}/api/sauvegarder`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nom: nom,
-                    score: score,
-                    total: total,
-                    niveau: niveau,
-                    reponses: reponses
-                })
-            }
-        );
-
-        console.log("📡 Statut HTTP sauvegarde :", response.status);
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status} - Vérifie ton serveur Flask sur Alwaysdata`);
-        }
-
-        const data = await response.json();
-        console.log("📦 Réponse du serveur :", data);
-
-        // Vérification large selon la structure de retour de ton Flask
-        if (data.success === true || data.message === 'Succès' || response.ok) {
-            console.log("✅ Résultat enregistré avec succès dans phpMyAdmin.");
-            return true;
-        }
-
-        console.error("❌ Erreur renvoyée par le serveur :", data.error || data);
-        return false;
-
-    } catch (err) {
-        console.error("❌ Erreur réseau ou blocage CORS lors de la sauvegarde :", err);
-        return false;
-    }
+  } catch (err) {
+    console.error("❌ Erreur lors de la sauvegarde :", err);
+  }
 }
 
 // ==========================================
 // 8. AFFICHAGE DES RÉSULTATS
 // ==========================================
-async function showResults() {
+function showResults() {
   quizContainer.classList.add('hidden');
   resultContainer.classList.remove('hidden');
 
@@ -751,17 +504,7 @@ async function showResults() {
   }
 
   // Sauvegarde globale vers BDD
-  const sauvegardeOK = await sauvegarderResultatBDD(
-    studentName,
-    score,
-    total,
-    chosenTarget,
-    userAnswers
-);
-
-if (sauvegardeOK) {
-    console.log("✅ Historique mis à jour.");
-}
+  sauvegarderResultatBDD(studentName, score, total, chosenTarget, userAnswers);
 }
 
 // Navigation de retour

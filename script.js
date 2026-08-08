@@ -1,4 +1,7 @@
-const API_URL = 'https://quiz-app-w965.onrender.com';
+// ==========================================
+// 1. URL DE L'API (Alwaysdata)
+// ==========================================
+const API_URL = 'https://quiz-app-w965.alwaysdata.net';
 // ==========================================
 // 1. BANQUE DE QUESTIONS (10 Q / MODULAIRE)
 // ==========================================
@@ -608,6 +611,58 @@ async function sauvegarderResultatBDD(
             err
         );
 
+        return false;
+    }
+}// ==========================================
+// 7. BDD & SAUVEGARDE
+// ==========================================
+async function sauvegarderResultatBDD(
+    nom,
+    score,
+    total,
+    niveau,
+    reponses
+) {
+    try {
+        console.log("💾 Tentative de sauvegarde vers Alwaysdata...");
+
+        const response = await fetch(
+            `${API_URL}/api/sauvegarder`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nom: nom,
+                    score: score,
+                    total: total,
+                    niveau: niveau,
+                    reponses: reponses
+                })
+            }
+        );
+
+        console.log("📡 Statut HTTP sauvegarde :", response.status);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status} - Vérifie ton serveur Flask sur Alwaysdata`);
+        }
+
+        const data = await response.json();
+        console.log("📦 Réponse du serveur :", data);
+
+        // Vérification large selon la structure de retour de ton Flask
+        if (data.success === true || data.message === 'Succès' || response.ok) {
+            console.log("✅ Résultat enregistré avec succès dans phpMyAdmin.");
+            return true;
+        }
+
+        console.error("❌ Erreur renvoyée par le serveur :", data.error || data);
+        return false;
+
+    } catch (err) {
+        console.error("❌ Erreur réseau ou blocage CORS lors de la sauvegarde :", err);
         return false;
     }
 }

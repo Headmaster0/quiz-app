@@ -1,7 +1,7 @@
 // ==========================================
 // 1. URL DE L'API (Alwaysdata)
 // ==========================================
-const API_URL = 'https://quiz-app-w965.alwaysdata.net';
+const API_URL = 'https://test-positionnement-sidji-formation.alwaysdata.net';
 // ==========================================
 // 1. BANQUE DE QUESTIONS (10 Q / MODULAIRE)
 // ==========================================

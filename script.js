@@ -718,6 +718,43 @@ function showResults() {
   sauvegarderResultatBDD(studentName, score, total, chosenTarget, userAnswers);
 }
 
+// Bouton « Accueil » : demande confirmation si un test est en cours
+function allerAccueil() {
+  const quizEnCours = quizContainer && !quizContainer.classList.contains('hidden') && currentQuestionIndex > 0;
+  if (quizEnCours && !confirm('Quitter le test en cours ? Vos réponses ne seront pas enregistrées.')) return;
+  resetToHome();
+}
+
+// ==========================================
+// 9. THÈME CLAIR / SOMBRE
+// ==========================================
+function appliquerTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const sombre = theme === 'dark';
+  const icon = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  const btn = document.getElementById('theme-toggle');
+  // Le bouton propose le thème inverse
+  if (icon) icon.textContent = sombre ? '☀️' : '🌙';
+  if (label) label.textContent = sombre ? 'Thème clair' : 'Thème sombre';
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(!sombre));
+    btn.setAttribute('aria-label', sombre ? 'Passer au thème clair' : 'Passer au thème sombre');
+    btn.title = btn.getAttribute('aria-label');
+  }
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', sombre ? '#0f172a' : '#eef2f7');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  appliquerTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const nouveau = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('quiz_theme', nouveau); } catch (e) {}
+    appliquerTheme(nouveau);
+  });
+});
+
 // Navigation de retour
 function resetToHome() {
   arreterVoix();

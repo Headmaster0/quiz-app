@@ -5,9 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test de positionnement &amp; Intégration Civique - SIDJI Formation</title>
     <link rel="icon" type="image/png" href="logo.png">
+    <meta name="theme-color" content="#0f172a">
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Applique le thème avant l'affichage (évite un flash de la mauvaise couleur)
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('quiz_theme'); } catch (e) {}
+            if (t !== 'light' && t !== 'dark') {
+                t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
 </head>
 <body>
+
+    <!-- Barre du haut : toujours visible -->
+    <header class="topbar">
+        <button type="button" class="topbar-brand" onclick="allerAccueil()" title="Retour à l'accueil">
+            <img src="logo.png" alt="" width="40" height="40">
+            <span>SIDJI Formation</span>
+        </button>
+        <nav class="topbar-actions" aria-label="Navigation">
+            <button type="button" id="home-btn" class="icon-btn" onclick="allerAccueil()">
+                <span class="icon" aria-hidden="true">🏠</span><span>Accueil</span>
+            </button>
+            <button type="button" id="theme-toggle" class="icon-btn" aria-pressed="false">
+                <span class="icon" id="theme-icon" aria-hidden="true">☀️</span><span class="label" id="theme-label">Thème clair</span>
+            </button>
+        </nav>
+    </header>
 
     <div class="container">
         <!-- 1. Écran de démarrage : Saisie du nom -->
@@ -29,7 +57,6 @@
         <!-- 2. Écran de choix du parcours -->
         <div id="level-selection-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1>Choix de votre objectif de formation</h1>
                 <h2>Sélectionnez un test d'entraînement (10 questions par module)</h2>
             </div>
@@ -123,7 +150,6 @@
         <!-- 3. Écran du Quiz -->
         <div id="quiz-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1 id="quiz-title">Quiz de Français</h1>
             </div>
             <div class="card">
@@ -153,7 +179,6 @@
         <!-- 4. Écran des Résultats -->
         <div id="result-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1>Bilan &amp; Préconisation de Formation</h1>
             </div>
 

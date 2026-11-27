@@ -37,8 +37,9 @@
     <main class="container">
 
         <!-- Connexion -->
-        <section id="login-section" class="card start-card" aria-labelledby="login-title">
-            <h1 id="login-title" class="admin-title">🔒 Espace formateur</h1>
+        <section id="login-section" class="card start-card login-card" aria-labelledby="login-title">
+            <div class="login-badge" aria-hidden="true">🎓</div>
+            <h1 id="login-title" class="admin-title">Espace formateur</h1>
             <p>Entrez le code d'accès pour consulter les résultats des apprenants.</p>
             <form id="login-form" class="form-group" autocomplete="off">
                 <label for="admin-code" class="sr-only">Code d'accès</label>
@@ -46,6 +47,7 @@
                 <button type="submit" class="btn" id="login-btn">Se connecter</button>
             </form>
             <p id="login-error" class="form-error" role="alert"></p>
+            <p class="login-note">🔒 Accès réservé à l'équipe SIDJI Formation</p>
         </section>
 
         <!-- Tableau de bord -->

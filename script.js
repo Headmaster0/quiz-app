@@ -1,9 +1,4 @@
-// ==========================================
-// 0. CONFIGURATION
-// ==========================================
-// URL du backend Flask. A modifier ici uniquement (une seule source de vérité).
-// Ex. Alwaysdata : 'https://ton-compte.alwaysdata.net'
-const API_URL = 'https://quiz-app-w965.onrender.com';
+// Configuration (API_URL), thème et libellés : voir common.js (chargé avant ce fichier)
 
 // ==========================================
 // 1. BANQUE DE QUESTIONS (10 Q / MODULAIRE)
@@ -305,16 +300,6 @@ function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
-}
-
-// Libellé lisible d'un module (ex. 'CSP' -> 'Carte de Séjour Pluriannuelle')
-function labelCourt(code) {
-  const labels = {
-    GRAMMAR: 'Grammaire & Vocabulaire', READING: 'Lecture & Analyse', CIVIC_SKILL: 'Vie Citoyenne',
-    CSP: 'Carte de Séjour Pluriannuelle', CR: 'Carte de Résident', NAT: 'Naturalisation',
-    A1: 'Niveau A1', A2: 'Niveau A2', B1: 'Niveau B1', B2: 'Niveau B2', ALL: 'Test Global TCF'
-  };
-  return labels[code] || code;
 }
 
 // Fisher-Yates shuffle
@@ -724,36 +709,6 @@ function allerAccueil() {
   if (quizEnCours && !confirm('Quitter le test en cours ? Vos réponses ne seront pas enregistrées.')) return;
   resetToHome();
 }
-
-// ==========================================
-// 9. THÈME CLAIR / SOMBRE
-// ==========================================
-function appliquerTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  const sombre = theme === 'dark';
-  const icon = document.getElementById('theme-icon');
-  const label = document.getElementById('theme-label');
-  const btn = document.getElementById('theme-toggle');
-  // Le bouton propose le thème inverse
-  if (icon) icon.textContent = sombre ? '☀️' : '🌙';
-  if (label) label.textContent = sombre ? 'Thème clair' : 'Thème sombre';
-  if (btn) {
-    btn.setAttribute('aria-pressed', String(!sombre));
-    btn.setAttribute('aria-label', sombre ? 'Passer au thème clair' : 'Passer au thème sombre');
-    btn.title = btn.getAttribute('aria-label');
-  }
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', sombre ? '#0f172a' : '#eef2f7');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  appliquerTheme(document.documentElement.getAttribute('data-theme') || 'dark');
-  document.getElementById('theme-toggle')?.addEventListener('click', () => {
-    const nouveau = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem('quiz_theme', nouveau); } catch (e) {}
-    appliquerTheme(nouveau);
-  });
-});
 
 // Navigation de retour
 function resetToHome() {

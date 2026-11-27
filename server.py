@@ -1,5 +1,7 @@
+import hmac
 import json
 import os
+from datetime import datetime, timedelta
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -25,6 +27,9 @@ db_config = {
 
 MAX_NOM = 100
 MAX_NIVEAU = 50
+
+# Code d'acces a l'interface admin (admin.html) : variable d'environnement ADMIN_CODE
+ADMIN_CODE = os.environ.get("ADMIN_CODE", "")
 
 
 def get_connection():
@@ -109,6 +114,102 @@ def historique(nom):
     except Exception as e:
         app.logger.error("Erreur SQL (historique) : %s", e)
         return jsonify({"error": "Erreur serveur lors de la lecture de l'historique"}), 500
+    finally:
+        if conn is not None and conn.is_connected():
+            conn.close()
+
+
+# =====================================================================
+# Interface d'administration (consultation des resultats)
+# =====================================================================
+def admin_autorise():
+    """Verifie le code envoye dans l'en-tete Authorization: Bearer <code>."""
+    if not ADMIN_CODE:
+        return False
+    entete = request.headers.get("Authorization", "")
+    code = entete[7:] if entete.startswith("Bearer ") else ""
+    return hmac.compare_digest(code.encode(), ADMIN_CODE.encode())
+
+
+@app.route("/api/admin/verifier", methods=["GET"])
+def admin_verifier():
+    if not ADMIN_CODE:
+        return jsonify({"error": "Interface admin non configurée (ADMIN_CODE manquant)"}), 503
+    if not admin_autorise():
+        return jsonify({"error": "Code d'accès incorrect"}), 401
+    return jsonify({"ok": True}), 200
+
+
+@app.route("/api/admin/resultats", methods=["GET"])
+def admin_resultats():
+    if not ADMIN_CODE:
+        return jsonify({"error": "Interface admin non configurée (ADMIN_CODE manquant)"}), 503
+    if not admin_autorise():
+        return jsonify({"error": "Code d'accès incorrect"}), 401
+
+    recherche = (request.args.get("q") or "").strip()[:MAX_NOM]
+    module = (request.args.get("module") or "").strip()[:MAX_NIVEAU]
+    try:
+        jours = int(request.args.get("jours") or 0)
+    except ValueError:
+        jours = 0
+    try:
+        limite = max(1, min(int(request.args.get("limit") or 500), 2000))
+    except ValueError:
+        limite = 500
+
+    conditions, params = [], []
+    if recherche:
+        conditions.append("LOWER(nom_apprenant) LIKE LOWER(%s)")
+        params.append(f"%{recherche}%")
+    if module:
+        conditions.append("niveau_estime = %s")
+        params.append(module)
+    if jours > 0:
+        conditions.append("date_passage >= %s")
+        params.append(datetime.now() - timedelta(days=jours))
+    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            f"""
+            SELECT nom_apprenant, score, total_questions, niveau_estime, date_passage, reponses
+            FROM resultats_apprenants
+            {where}
+            ORDER BY date_passage DESC
+            LIMIT {limite}
+            """,
+            tuple(params),
+        )
+        lignes = cursor.fetchall()
+        cursor.close()
+
+        resultats = []
+        for r in lignes:
+            reponses = r.get("reponses")
+            if isinstance(reponses, (bytes, bytearray)):
+                reponses = reponses.decode("utf-8", "replace")
+            if isinstance(reponses, str):
+                try:
+                    reponses = json.loads(reponses)
+                except ValueError:
+                    reponses = None
+            date = r.get("date_passage")
+            resultats.append({
+                "nom": r.get("nom_apprenant"),
+                "score": r.get("score"),
+                "total": r.get("total_questions"),
+                "module": r.get("niveau_estime"),
+                "date": date.isoformat() if hasattr(date, "isoformat") else date,
+                "reponses": reponses if isinstance(reponses, list) else [],
+            })
+        return jsonify({"resultats": resultats}), 200
+    except Exception as e:
+        app.logger.error("Erreur SQL (admin_resultats) : %s", e)
+        return jsonify({"error": "Erreur serveur : impossible de lire les résultats"}), 500
     finally:
         if conn is not None and conn.is_connected():
             conn.close()

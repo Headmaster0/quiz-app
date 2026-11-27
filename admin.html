@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Espace formateur – Résultats des apprenants – SIDJI Formation</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('quiz_theme'); } catch (e) {}
+            if (t !== 'light' && t !== 'dark') {
+                t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+<body class="admin-page">
+
+    <header class="topbar">
+        <a class="topbar-brand" href="index.html" title="Retour au site des tests">
+            <img src="logo.png" alt="" width="40" height="40">
+            <span>SIDJI Formation · Espace formateur</span>
+        </a>
+        <nav class="topbar-actions" aria-label="Navigation">
+            <a class="icon-btn" href="index.html"><span class="icon" aria-hidden="true">🏠</span><span>Site des tests</span></a>
+            <button type="button" id="theme-toggle" class="icon-btn" aria-pressed="false">
+                <span class="icon" id="theme-icon" aria-hidden="true">☀️</span><span class="label" id="theme-label">Thème clair</span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <!-- Connexion -->
+        <section id="login-section" class="card start-card" aria-labelledby="login-title">
+            <h1 id="login-title" class="admin-title">🔒 Espace formateur</h1>
+            <p>Entrez le code d'accès pour consulter les résultats des apprenants.</p>
+            <form id="login-form" class="form-group" autocomplete="off">
+                <label for="admin-code" class="sr-only">Code d'accès</label>
+                <input type="password" id="admin-code" placeholder="Code d'accès" required autocomplete="current-password">
+                <button type="submit" class="btn" id="login-btn">Se connecter</button>
+            </form>
+            <p id="login-error" class="form-error" role="alert"></p>
+        </section>
+
+        <!-- Tableau de bord -->
+        <section id="dashboard" class="hidden" aria-labelledby="dash-title">
+            <div class="admin-head">
+                <h1 id="dash-title" class="admin-title">Résultats des apprenants</h1>
+                <div class="admin-head-actions">
+                    <button type="button" class="btn-secondary" id="refresh-btn">🔄 Actualiser</button>
+                    <button type="button" class="btn" id="export-btn">⬇️ Exporter (Excel / CSV)</button>
+                    <button type="button" class="btn-secondary" id="logout-btn">Se déconnecter</button>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="filters" role="search">
+                <label class="filter">
+                    <span>Apprenant</span>
+                    <input type="text" id="filter-name" placeholder="Rechercher un nom…">
+                </label>
+                <label class="filter">
+                    <span>Module</span>
+                    <select id="filter-module"><option value="">Tous les modules</option></select>
+                </label>
+                <label class="filter">
+                    <span>Période</span>
+                    <select id="filter-period">
+                        <option value="7">7 derniers jours</option>
+                        <option value="30" selected>30 derniers jours</option>
+                        <option value="90">3 derniers mois</option>
+                        <option value="0">Tout</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- Chiffres clés -->
+            <div class="stat-tiles" aria-live="polite">
+                <div class="stat-tile"><span class="stat-label">Tests passés</span><span class="stat-value" id="stat-tests">–</span></div>
+                <div class="stat-tile"><span class="stat-label">Apprenants</span><span class="stat-value" id="stat-learners">–</span></div>
+                <div class="stat-tile"><span class="stat-label">Score moyen</span><span class="stat-value" id="stat-avg">–</span></div>
+                <div class="stat-tile"><span class="stat-label">Modules validés (≥ 70 %)</span><span class="stat-value" id="stat-pass">–</span></div>
+            </div>
+
+            <p id="dash-message" class="dash-message" role="status"></p>
+
+            <!-- Liste -->
+            <div class="table-wrap">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Apprenant</th>
+                            <th scope="col">Module</th>
+                            <th scope="col" class="num">Score</th>
+                            <th scope="col">Résultat</th>
+                            <th scope="col"><span class="sr-only">Détail</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Détail d'un test -->
+    <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
+        <div class="detail-head">
+            <h2 id="detail-title">Détail du test</h2>
+            <button type="button" class="icon-btn" id="detail-close" aria-label="Fermer">✕</button>
+        </div>
+        <p id="detail-summary" class="detail-summary"></p>
+        <div id="detail-list"></div>
+    </dialog>
+
+    <script src="common.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

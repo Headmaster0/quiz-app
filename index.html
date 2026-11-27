@@ -127,7 +127,20 @@
                 <h1 id="quiz-title">Quiz de Français</h1>
             </div>
             <div class="card">
+                <div class="quiz-progress" aria-hidden="true"><div id="quiz-progress-bar" class="quiz-progress-bar"></div></div>
+
+                <figure class="question-illustration">
+                    <img id="question-image" src="images/grammaire.svg" alt="" width="240" height="160">
+                </figure>
+
                 <h2 id="question-text">Chargement de la question...</h2>
+
+                <div class="voice-controls voice-only">
+                    <button type="button" id="listen-btn" class="speak-btn">🔊 Écouter la question</button>
+                    <label class="auto-read">
+                        <input type="checkbox" id="auto-read-toggle"> Lecture automatique
+                    </label>
+                </div>
                 <div id="options-container" class="options-grid"></div>
                 
                 <div class="actions-group">

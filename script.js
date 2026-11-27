@@ -169,6 +169,107 @@ const MODULE_TITLES = {
 };
 
 // ==========================================
+// 1 bis. ILLUSTRATIONS (dessins originaux, libres de droits, dossier images/)
+// ==========================================
+// L'ordre compte : la première règle qui correspond au texte de la question gagne.
+const ILLUSTRATION_RULES = [
+  { img: 'urgence',   re: /112|urgence|accident|témoin/i },
+  { img: 'histoire',  re: /1789|1905|1958|Bastille|Histoire|fondé|Déclaration des Droits|Pasteur|scientifique/i },
+  { img: 'sante',     re: /malade|arrêt de travail|médecin|santé|CPAM|vaccin|ordonnance/i },
+  { img: 'logement',  re: /logement|loyer|propriétaire|domicile|adresse|maison|bail|serrure/i },
+  { img: 'vote',      re: /vote|élect|élit|député|suffrage|Président|mandat/i },
+  { img: 'drapeau',   re: /drapeau|symbole|Marianne|Marseillaise|devise|hymne|14 juillet|Fête Nationale|couleurs/i },
+  { img: 'loi',       re: /loi|discrimination|juré|assises|justice|conciliateur|Constitution|Conseil|Parlement|Sénat|laïcité|religion|neutralité|droit|litige|règles/i },
+  { img: 'mairie',    re: /\bmaire\b|mairie|commune|départements?\b/i },
+  { img: 'travail',   re: /travail|employeur|embaucher|recruteur|négociations|direction/i },
+  { img: 'ecole',     re: /école|instruction|enfant|examen|formation|stage|étudiant|cours|révisé|test/i },
+  { img: 'documents', re: /préfecture|CAF|dossier|formulaire|document|justificatif|pièce|convocation|guichet|administration|démarche|demande|badge/i },
+  { img: 'parole',    re: /comment .* -vous|bonjour|parler|demandé/i }
+];
+
+const MODULE_DEFAULT_IMAGE = {
+  GRAMMAR: 'grammaire', READING: 'lecture', CIVIC_SKILL: 'drapeau',
+  CSP: 'documents', CR: 'documents', NAT: 'drapeau',
+  A1: 'parole', A2: 'grammaire', B1: 'grammaire', B2: 'grammaire', ALL: 'grammaire'
+};
+
+const IMAGE_LABELS = {
+  urgence: "Téléphone avec le numéro d'urgence 112", sante: 'Croix de pharmacie et stéthoscope',
+  logement: 'Maison et clé', vote: 'Urne de vote', histoire: 'Monument historique',
+  drapeau: 'Drapeau français', loi: 'Balance de la justice', mairie: 'Bâtiment de la mairie',
+  travail: 'Mallette de travail', ecole: "Tableau d'école", documents: 'Dossier administratif',
+  parole: 'Bulles de conversation', grammaire: 'Livre de grammaire', lecture: 'Panneau à lire'
+};
+
+function illustrationPour(question, moduleCode) {
+  const regle = ILLUSTRATION_RULES.find(r => r.re.test(question.text));
+  const nom = regle ? regle.img : (MODULE_DEFAULT_IMAGE[moduleCode] || 'grammaire');
+  return { src: `images/${nom}.svg`, alt: IMAGE_LABELS[nom] || '' };
+}
+
+// ==========================================
+// 1 ter. LECTURE À VOIX HAUTE (synthèse vocale du navigateur, gratuite)
+// ==========================================
+const voixDisponible = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+let voixFrancaise = null;
+
+function choisirVoixFrancaise() {
+  if (!voixDisponible) return;
+  const voix = window.speechSynthesis.getVoices();
+  voixFrancaise =
+    voix.find(v => v.lang === 'fr-FR' && /google|natural|online/i.test(v.name)) ||
+    voix.find(v => v.lang === 'fr-FR') ||
+    voix.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) ||
+    null;
+}
+if (voixDisponible) {
+  choisirVoixFrancaise();
+  window.speechSynthesis.onvoiceschanged = choisirVoixFrancaise;
+}
+
+// Rend un texte de question agréable à l'oral (blancs, crochets, guillemets…)
+function texteOral(texte) {
+  return String(texte)
+    .replace(/\[Mise en situation\]\s*/gi, 'Mise en situation. ')
+    .replace(/_{2,}/g, ' … ')
+    .replace(/[«»"]/g, '')
+    .replace(/\s'|'\s|^'|'$/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parler(textes) {
+  if (!voixDisponible) return;
+  window.speechSynthesis.cancel();
+  [].concat(textes).forEach(t => {
+    const u = new SpeechSynthesisUtterance(texteOral(t));
+    u.lang = 'fr-FR';
+    u.rate = 0.9; // un peu plus lent, adapté aux apprenants
+    if (voixFrancaise) u.voice = voixFrancaise;
+    window.speechSynthesis.speak(u);
+  });
+}
+
+function arreterVoix() {
+  if (voixDisponible) window.speechSynthesis.cancel();
+}
+
+// Phrase complète avec la bonne réponse (ex. "Je suis étudiant à SIDJI Formation.")
+function phraseCorrigee(question, bonneReponse) {
+  if (!/_{2,}/.test(question)) return `${question} Réponse : ${bonneReponse}.`;
+  // On garde la phrase à trous (après « : » s'il y a une consigne), sans les guillemets autour
+  const idx = question.indexOf(' : ');
+  let modele = idx !== -1 && /_{2,}/.test(question.slice(idx)) ? question.slice(idx + 3) : question;
+  modele = modele.trim().replace(/^'/, '').replace(/'$/, '');
+  const remplissage = bonneReponse.endsWith("'") ? bonneReponse : bonneReponse + ' ';
+  return modele.replace(/_{2,}\s*/, remplissage).replace(/\s+([.,!?])/g, '$1').replace(/\s+/g, ' ').trim();
+}
+
+function lectureAutoActive() {
+  try { return localStorage.getItem('quiz_lecture_auto') === '1'; } catch (e) { return false; }
+}
+
+// ==========================================
 // 2. VARIABLES D'ÉTAT GLOBALES
 // ==========================================
 let studentName = "";
@@ -252,6 +353,22 @@ document.addEventListener('DOMContentLoaded', () => {
   studentNameInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') startBtn?.click();
   });
+
+  // Lecture à voix haute
+  const listenBtn = document.getElementById('listen-btn');
+  const autoToggle = document.getElementById('auto-read-toggle');
+  if (!voixDisponible) {
+    document.querySelectorAll('.voice-only').forEach(el => el.classList.add('hidden'));
+  } else {
+    listenBtn?.addEventListener('click', lireQuestionCourante);
+    if (autoToggle) {
+      autoToggle.checked = lectureAutoActive();
+      autoToggle.addEventListener('change', () => {
+        try { localStorage.setItem('quiz_lecture_auto', autoToggle.checked ? '1' : '0'); } catch (e) {}
+        if (autoToggle.checked) lireQuestionCourante(); else arreterVoix();
+      });
+    }
+  }
 
   // Écouteur sur le changement d'utilisateur
   document.getElementById('change-user-btn')?.addEventListener('click', () => {
@@ -359,22 +476,58 @@ function selectLevel(target) {
 
 function loadQuestion() {
   selectedOptionIndex = null;
+  arreterVoix();
   const q = activeQuestions[currentQuestionIndex];
-  
+
+  // Illustration de la question
+  const img = document.getElementById('question-image');
+  if (img) {
+    const illu = illustrationPour(q, chosenTarget);
+    img.src = illu.src;
+    img.alt = illu.alt;
+  }
+
+  // Barre de progression
+  const progress = document.getElementById('quiz-progress-bar');
+  if (progress) progress.style.width = `${(currentQuestionIndex / activeQuestions.length) * 100}%`;
+
   if (questionText) {
     questionText.textContent = `Question ${currentQuestionIndex + 1}/${activeQuestions.length} : ${q.text}`;
   }
-  
+
   if (optionsContainer) {
     optionsContainer.innerHTML = '';
     q.options.forEach((opt, index) => {
+      const row = document.createElement('div');
+      row.className = 'option-row';
+
       const btn = document.createElement('button');
       btn.classList.add('option-btn');
       btn.textContent = opt;
       btn.onclick = () => selectOption(btn, index);
-      optionsContainer.appendChild(btn);
+      row.appendChild(btn);
+
+      if (voixDisponible) {
+        const ecouter = document.createElement('button');
+        ecouter.type = 'button';
+        ecouter.className = 'speak-btn speak-btn-small';
+        ecouter.textContent = '🔊';
+        ecouter.title = 'Écouter cette réponse';
+        ecouter.setAttribute('aria-label', `Écouter la réponse : ${opt}`);
+        ecouter.onclick = () => parler(opt);
+        row.appendChild(ecouter);
+      }
+      optionsContainer.appendChild(row);
     });
   }
+
+  if (lectureAutoActive()) lireQuestionCourante();
+}
+
+function lireQuestionCourante() {
+  const q = activeQuestions[currentQuestionIndex];
+  if (!q) return;
+  parler([q.text, ...q.options.map((o, i) => `Réponse ${i + 1} : ${o}.`)]);
 }
 
 function selectOption(selectedBtn, index) {
@@ -470,6 +623,9 @@ async function sauvegarderResultatBDD(nom, score, total, niveau, reponses) {
 // 8. AFFICHAGE DES RÉSULTATS
 // ==========================================
 function showResults() {
+  arreterVoix();
+  const progress = document.getElementById('quiz-progress-bar');
+  if (progress) progress.style.width = '100%';
   quizContainer.classList.add('hidden');
   resultContainer.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -546,6 +702,14 @@ function showResults() {
           <p>Bonne réponse : <strong>${escapeHTML(ans.correctAns)}</strong></p>
         `;
       }
+      if (voixDisponible) {
+        const ecouter = document.createElement('button');
+        ecouter.type = 'button';
+        ecouter.className = 'speak-btn';
+        ecouter.textContent = '🔊 Écouter la bonne phrase';
+        ecouter.onclick = () => parler(phraseCorrigee(ans.question, ans.correctAns));
+        item.appendChild(ecouter);
+      }
       detailsContainer.appendChild(item);
     });
   }
@@ -556,6 +720,7 @@ function showResults() {
 
 // Navigation de retour
 function resetToHome() {
+  arreterVoix();
   quizContainer.classList.add('hidden');
   resultContainer.classList.add('hidden');
 

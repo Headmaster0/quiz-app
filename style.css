@@ -477,3 +477,29 @@ input[type="text"]:focus {
   border-color: #16a34a;
   box-shadow: 0 6px 15px rgba(22, 163, 74, 0.3);
 }
+/* --- Statut d'enregistrement du résultat --- */
+.save-status {
+  margin: 0 auto 16px;
+  max-width: 640px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.save-status:empty { display: none; }
+.save-status.pending { background: #f1f5f9; color: #334155; }
+.save-status.ok      { background: #dcfce7; color: #166534; }
+.save-status.error   { background: #fee2e2; color: #991b1b; }
+
+/* Bouton "Faire un autre test" sous le bilan */
+.result-actions { justify-content: center; margin-top: 20px; }
+
+/* Focus clavier visible (accessibilité) */
+.btn:focus-visible,
+.btn-secondary:focus-visible,
+.level-card:focus-visible,
+.option-btn:focus-visible,
+input:focus-visible {
+  outline: 3px solid #0284c7;
+  outline-offset: 2px;
+}

@@ -1,4 +1,11 @@
 // ==========================================
+// 0. CONFIGURATION
+// ==========================================
+// URL du backend Flask. A modifier ici uniquement (une seule source de vérité).
+// Ex. Alwaysdata : 'https://ton-compte.alwaysdata.net'
+const API_URL = 'https://quiz-app-w965.onrender.com';
+
+// ==========================================
 // 1. BANQUE DE QUESTIONS (10 Q / MODULAIRE)
 // ==========================================
 const questionBank = {
@@ -18,7 +25,7 @@ const questionBank = {
 
   // --- COMPRÉHENSION ÉCRITE (LECTURE & ANALYSE) ---
   'READING': [
-    { text: 'Texte : \'Horaires du guichet : Lundi au Vendredi de 8h30 à 12h00. Fermé l\'après-midi.\' Que comprendrez-vous ?', options: ['Le guichet est fermé l\'après-midi', 'Le guichet est ouvert le samedi matin', 'Le guichet ouvre toute la journée', 'Le guichet est réservé aux urgences'], correctIndex: 0 },
+    { text: 'Texte : \'Horaires du guichet : Lundi au Vendredi de 8h30 à 12h00. Fermé l\'après-midi.\' Que comprenez-vous ?', options: ['Le guichet est fermé l\'après-midi', 'Le guichet est ouvert le samedi matin', 'Le guichet ouvre toute la journée', 'Le guichet est réservé aux urgences'], correctIndex: 0 },
     { text: 'Texte : \'Pensez à vous munir de deux pièces d\'identité originales.\' Que signifie cette consigne ?', options: ['Apporter 2 documents d\'identité originaux (pas de copies)', 'Envoyer 2 photocopies par courrier', 'Présenter 1 seul document', 'Ne rien apporter de particulier'], correctIndex: 0 },
     { text: 'Texte : \'Toute demande incomplète sera automatiquement rejetée.\' Que faut-il faire ?', options: ['Fournir l\'intégralité des pièces demandées', 'Envoyer seulement la moitié du dossier', 'Payer des frais supplémentaires', 'Attendre une relance téléphonique'], correctIndex: 0 },
     { text: 'Texte : \'Accès interdit sans badge d\'identification.\' Que signifie ce panneau ?', options: ['Seules les personnes ayant un badge peuvent entrer', 'Entrée libre pour tout le monde', 'Entrée réservée aux étudiants', 'Port du masque obligatoire'], correctIndex: 0 },
@@ -48,13 +55,13 @@ const questionBank = {
   'CSP': [
     { text: 'Quelle est la devise officielle de la République française ?', options: ['Liberté, Égalité, Fraternité', 'Travail, Famille, Patrie', 'Justice, Paix, Unité', 'Sécurité et Propriété'], correctIndex: 0 },
     { text: '[Mise en situation] La préfecture vous demande un justificatif de domicile. Quel document pouvez-vous fournir ?', options: ['Une facture d\'électricité de moins de 6 mois', 'Une carte bancaire', 'Un diplôme', 'Une fiche de paie d\'il y a 2 ans'], correctIndex: 0 },
-    { text: 'En France, à quel âge l\'instruction est-elle obligatoire pour tous les enfants ?', options: ['3 ans', '6 ans', '10 ans', '16 ans'], correctIndex: 0 },
+    { text: 'En France, à partir de quel âge l\'instruction est-elle obligatoire pour tous les enfants ?', options: ['3 ans', '6 ans', '10 ans', '16 ans'], correctIndex: 0 },
     { text: '[Mise en situation] Vous êtes malade et ne pouvez pas aller travailler. Que devez-vous faire sous 48h ?', options: ['Envoyer un arrêt de travail à l\'employeur et à la CPAM', 'Attendre de guérir avant d\'avertir la société', 'Rendre visite à la mairie', 'Poster un message sur les réseaux sociaux'], correctIndex: 0 },
-    { text: 'L\'expression : \'Demain, ils ___ le nouveau formulaire en ligne.\'', options: ['rempliront', 'remplissaient', 'ont rempli', 'remplir'], correctIndex: 0 },
+    { text: 'Complétez : \'Demain, ils ___ le nouveau formulaire en ligne.\'', options: ['rempliront', 'remplissaient', 'ont rempli', 'remplir'], correctIndex: 0 },
     { text: 'Quel est le symbole républicain qui représente la République française ?', options: ['Marianne', 'Jeanne d\'Arc', 'La Joconde', 'Marie Curie'], correctIndex: 0 },
     { text: '[Mise en situation] Votre propriétaire souhaite augmenter le loyer sans motif légal en cours de bail. Que pouvez-vous faire ?', options: ['Consulter l\'ADIL ou une association de consommateurs', 'Arrêter immédiatement de payer', 'Changer les serrures sans prévenir', 'Contacter le Préfet'], correctIndex: 0 },
-    { text: 'Trouvez le synonyme du mot \'Demander\' :', options: ['Solliciter', 'Refuser', 'Exiger', 'Abandonner'], correctIndex: 0 },
-    { text: 'Quels sont les trois couleurs du drapeau français ?', options: ['Bleu, Blanc, Rouge', 'Vert, Blanc, Rouge', 'Bleu, Jaune, Rouge', 'Rouge, Blanc, Noir'], correctIndex: 0 },
+    { text: 'Trouvez le synonyme du mot \'Demander\' :', options: ['Solliciter', 'Refuser', 'Répondre', 'Abandonner'], correctIndex: 0 },
+    { text: 'Quelles sont les trois couleurs du drapeau français ?', options: ['Bleu, Blanc, Rouge', 'Vert, Blanc, Rouge', 'Bleu, Jaune, Rouge', 'Rouge, Blanc, Noir'], correctIndex: 0 },
     { text: '[Mise en situation] Si vous changez d\'adresse postale, dans quel délai devez-vous le déclarer à l\'administration ?', options: ['Dans un délai de 3 mois', 'Ce n\'est pas obligatoire', 'Après 2 ans', 'Uniquement au renouvellement du titre'], correctIndex: 0 }
   ],
 
@@ -100,7 +107,7 @@ const questionBank = {
 
   'A2': [
     { text: 'Hier, nous ___ visiter un monument.', options: ['sommes allés', 'allons', 'allions', 'va'], correctIndex: 0 },
-    { text: 'Demain, elle ___ à la préfecture.', options: ['ira', 'est allée', 'va aller', 'allait'], correctIndex: 0 },
+    { text: 'Demain, elle ___ à la préfecture.', options: ['ira', 'est allée', 'irait', 'allait'], correctIndex: 0 },
     { text: 'Je n\'ai ___ compris à cet exercice.', options: ['rien', 'jamais', 'personne', 'aucun'], correctIndex: 0 },
     { text: 'C\'est l\'homme ___ m\'a aidé.', options: ['qui', 'que', 'où', 'dont'], correctIndex: 0 },
     { text: 'Il faut ___ les documents avant midi.', options: ['envoyer', 'envoyé', 'envoie', 'envoyions'], correctIndex: 0 },
@@ -108,7 +115,7 @@ const questionBank = {
     { text: 'Vous devez vous présenter ___ guichet n°3.', options: ['au', 'à la', 'en', 'dans'], correctIndex: 0 },
     { text: 'Elle m\'a demandé ___ je voulais venir.', options: ['si', 'que', 'ce que', 'qui'], correctIndex: 0 },
     { text: 'Ils ont acheté une grande maison ___ jardin.', options: ['avec', 'sans', 'pour', 'chez'], correctIndex: 0 },
-    { text: 'Merci de ___ répondre rapidement.', options: ['bien vouloir', 'vouloir bien', 'voulu', 'veut'], correctIndex: 0 }
+    { text: 'Merci de ___ répondre rapidement.', options: ['bien vouloir', 'bien voulu', 'voulant', 'veut'], correctIndex: 0 }
   ],
 
   'B1': [
@@ -147,6 +154,20 @@ questionBank['ALL'] = [
   questionBank['CSP'][0], questionBank['NAT'][0]
 ];
 
+const MODULE_TITLES = {
+  'GRAMMAR': 'Module : Structure de la langue (Grammaire & Vocabulaire)',
+  'READING': 'Module : Compréhension écrite (Lecture & Analyse)',
+  'CIVIC_SKILL': 'Module : Culture Civique & Mises en situation',
+  'CSP': 'Quiz Carte de Séjour Pluriannuelle (10 Questions)',
+  'CR': 'Quiz Carte de Résident (10 Questions)',
+  'NAT': 'Quiz Naturalisation (10 Questions)',
+  'A1': 'Entraînement Français - Niveau A1 (10 Questions)',
+  'A2': 'Entraînement Français - Niveau A2 (10 Questions)',
+  'B1': 'Entraînement Français - Niveau B1 (10 Questions)',
+  'B2': 'Entraînement Français - Niveau B2 (10 Questions)',
+  'ALL': 'Test de Positionnement Global TCF (10 Questions)'
+};
+
 // ==========================================
 // 2. VARIABLES D'ÉTAT GLOBALES
 // ==========================================
@@ -178,6 +199,23 @@ const resultContainer = document.getElementById('result-container');
 // ==========================================
 // 4. FONCTIONS UTILITAIRES & ALGORITHMES
 // ==========================================
+// Échappe le HTML pour éviter qu'un nom ou une donnée de la BDD n'injecte du code (XSS)
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+// Libellé lisible d'un module (ex. 'CSP' -> 'Carte de Séjour Pluriannuelle')
+function labelCourt(code) {
+  const labels = {
+    GRAMMAR: 'Grammaire & Vocabulaire', READING: 'Lecture & Analyse', CIVIC_SKILL: 'Vie Citoyenne',
+    CSP: 'Carte de Séjour Pluriannuelle', CR: 'Carte de Résident', NAT: 'Naturalisation',
+    A1: 'Niveau A1', A2: 'Niveau A2', B1: 'Niveau B1', B2: 'Niveau B2', ALL: 'Test Global TCF'
+  };
+  return labels[code] || code;
+}
+
 // Fisher-Yates shuffle
 function shuffleArray(array) {
   const arr = [...array];
@@ -210,6 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Valider le nom avec la touche Entrée
+  studentNameInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') startBtn?.click();
+  });
+
   // Écouteur sur le changement d'utilisateur
   document.getElementById('change-user-btn')?.addEventListener('click', () => {
     localStorage.removeItem('quiz_user');
@@ -240,11 +283,13 @@ async function afficherInterfaceUtilisateur(nom) {
 
   // Chargement de l'historique depuis l'API BDD
   try {
-    const response = await fetch(`https://quiz-app-w965.onrender.com/api/historique/${encodeURIComponent(nom)}`);
-    const historique = await response.json();
-
     const historyContainer = document.getElementById('history-list');
     if (!historyContainer) return;
+    historyContainer.innerHTML = '<p class="no-history">Chargement de vos résultats…</p>';
+
+    const response = await fetch(`${API_URL}/api/historique/${encodeURIComponent(nom)}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const historique = await response.json();
 
     historyContainer.innerHTML = '';
 
@@ -264,14 +309,18 @@ async function afficherInterfaceUtilisateur(nom) {
       const card = document.createElement('div');
       card.className = 'history-item';
       card.innerHTML = `
-        <span class="history-module">${item.niveau_estime}</span>
-        <span class="history-score"><strong>${item.score}</strong> / ${item.total_questions}</span>
-        <span class="history-date">${date}</span>
+        <span class="history-module">${escapeHTML(labelCourt(item.niveau_estime))}</span>
+        <span class="history-score"><strong>${escapeHTML(item.score)}</strong> / ${escapeHTML(item.total_questions)}</span>
+        <span class="history-date">${escapeHTML(date)}</span>
       `;
       historyContainer.appendChild(card);
     });
   } catch (err) {
     console.error("Erreur chargement historique :", err);
+    const historyContainer = document.getElementById('history-list');
+    if (historyContainer) {
+      historyContainer.innerHTML = '<p class="no-history">Historique indisponible pour le moment.</p>';
+    }
   }
 }
 
@@ -297,21 +346,7 @@ function selectLevel(target) {
     };
   });
 
-  const titles = {
-    'GRAMMAR': 'Module : Structure de la langue (Grammaire & Vocabulaire)',
-    'READING': 'Module : Compréhension écrite (Lecture & Analyse)',
-    'CIVIC_SKILL': 'Module : Culture Civique & Mises en situation',
-    'CSP': 'Quizz Carte de Séjour Pluriannuelle (10 Questions)',
-    'CR': 'Quizz Carte de Résident (10 Questions)',
-    'NAT': 'Quizz Naturalisation (10 Questions)',
-    'A1': 'Entraînement Français - Niveau A1 (10 Questions)',
-    'A2': 'Entraînement Français - Niveau A2 (10 Questions)',
-    'B1': 'Entraînement Français - Niveau B1 (10 Questions)',
-    'B2': 'Entraînement Français - Niveau B2 (10 Questions)',
-    'ALL': 'Test de Positionnement Global TCF (10 Questions)'
-  };
-
-  if (quizTitle) quizTitle.textContent = titles[target] || 'Quiz d\'évaluation (10 Questions)';
+  if (quizTitle) quizTitle.textContent = MODULE_TITLES[target] || 'Quiz d\'évaluation (10 Questions)';
 
   levelSelectionContainer.classList.add('hidden');
   quizContainer.classList.remove('hidden');
@@ -402,21 +437,32 @@ function processAnswer(isSkipped) {
 // ==========================================
 // 7. BDD & SAUVEGARDE
 // ==========================================
+function afficherStatutSauvegarde(type, message) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.className = `save-status ${type}`;
+  el.textContent = message;
+}
+
 async function sauvegarderResultatBDD(nom, score, total, niveau, reponses) {
+  afficherStatutSauvegarde('pending', 'Enregistrement de votre résultat…');
   try {
-    const response = await fetch('https://quiz-app-w965.onrender.com/api/sauvegarder', {
+    const response = await fetch(`${API_URL}/api/sauvegarder`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nom, score, total, niveau, reponses })
     });
-    const data = await response.json();
-    if (data.message === 'Succès' || data.success) {
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && (data.message === 'Succès' || data.success)) {
       console.log('✅ Résultat enregistré en base SQL !');
+      afficherStatutSauvegarde('ok', '✅ Résultat enregistré.');
     } else {
-      console.error('❌ Erreur serveur :', data.error);
+      console.error('❌ Erreur serveur :', response.status, data.error);
+      afficherStatutSauvegarde('error', "⚠️ Le résultat n'a pas pu être enregistré. Prévenez votre formateur.");
     }
   } catch (err) {
     console.error("❌ Erreur lors de la sauvegarde :", err);
+    afficherStatutSauvegarde('error', "⚠️ Connexion au serveur impossible : le résultat n'a pas été enregistré.");
   }
 }
 
@@ -426,6 +472,7 @@ async function sauvegarderResultatBDD(nom, score, total, niveau, reponses) {
 function showResults() {
   quizContainer.classList.add('hidden');
   resultContainer.classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const total = activeQuestions.length;
   const correctPercent = Math.round((score / total) * 100);
@@ -436,8 +483,8 @@ function showResults() {
   const scoreTextEl = document.getElementById('score-text');
   const levelTextEl = document.getElementById('level-text');
 
-  if (studentInfoEl) studentInfoEl.innerHTML = `<strong>Apprenant :</strong> ${studentName}`;
-  if (levelInfoEl) levelInfoEl.innerHTML = `<strong>Module / Objectif :</strong> ${chosenTarget}`;
+  if (studentInfoEl) studentInfoEl.innerHTML = `<strong>Apprenant :</strong> ${escapeHTML(studentName)}`;
+  if (levelInfoEl) levelInfoEl.innerHTML = `<strong>Module / Objectif :</strong> ${escapeHTML(labelCourt(chosenTarget))}`;
   if (scoreTextEl) scoreTextEl.innerHTML = `<strong>Score global :</strong> ${score} / ${total}`;
   if (levelTextEl) {
     levelTextEl.innerHTML = `<strong>Résultat :</strong> ${
@@ -481,22 +528,22 @@ function showResults() {
       if (ans.isSkipped) {
         item.classList.add('result-item', 'skipped');
         item.innerHTML = `
-          <p><strong>Q${i + 1} :</strong> ${ans.question}</p>
+          <p><strong>Q${i + 1} :</strong> ${escapeHTML(ans.question)}</p>
           <p>Votre réponse : <em>⚪ Pas de réponse (Question passée)</em></p>
-          <p>Bonne réponse : <strong>${ans.correctAns}</strong></p>
+          <p>Bonne réponse : <strong>${escapeHTML(ans.correctAns)}</strong></p>
         `;
       } else if (ans.isCorrect) {
         item.classList.add('result-item', 'correct');
         item.innerHTML = `
-          <p><strong>Q${i + 1} :</strong> ${ans.question}</p>
-          <p>Votre réponse : <em>${ans.userAns}</em> ✅</p>
+          <p><strong>Q${i + 1} :</strong> ${escapeHTML(ans.question)}</p>
+          <p>Votre réponse : <em>${escapeHTML(ans.userAns)}</em> ✅</p>
         `;
       } else {
         item.classList.add('result-item', 'incorrect');
         item.innerHTML = `
-          <p><strong>Q${i + 1} :</strong> ${ans.question}</p>
-          <p>Votre réponse : <em>${ans.userAns}</em> ❌</p>
-          <p>Bonne réponse : <strong>${ans.correctAns}</strong></p>
+          <p><strong>Q${i + 1} :</strong> ${escapeHTML(ans.question)}</p>
+          <p>Votre réponse : <em>${escapeHTML(ans.userAns)}</em> ❌</p>
+          <p>Bonne réponse : <strong>${escapeHTML(ans.correctAns)}</strong></p>
         `;
       }
       detailsContainer.appendChild(item);
@@ -524,4 +571,5 @@ function resetToHome() {
   score = 0;
   userAnswers = [];
   selectedOptionIndex = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }

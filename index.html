@@ -13,14 +13,14 @@
         <!-- 1. Écran de démarrage : Saisie du nom -->
         <div id="start-container">
             <div class="header-section">
-                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1>Plateforme de Positionnement &amp; Préparation Civique</h1>
             </div>
             <div class="card start-card">
                 <h2>Bienvenue</h2>
                 <p>Veuillez entrer votre prénom et nom pour accéder aux tests d'entraînement (10 questions par test).</p>
                 <div class="form-group" id="name-input-container">
-                    <input type="text" id="student-name" placeholder="Ex: Brandon Ouedraogo" required>
+                    <input type="text" id="student-name" placeholder="Ex: Brandon Ouedraogo" maxlength="100" autocomplete="name" aria-label="Prénom et nom" required>
                     <button id="start-btn" class="btn">Continuer</button>
                 </div>
             </div>
@@ -29,7 +29,7 @@
         <!-- 2. Écran de choix du parcours -->
         <div id="level-selection-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1>Choix de votre objectif de formation</h1>
                 <h2>Sélectionnez un test d'entraînement (10 questions par module)</h2>
             </div>
@@ -84,7 +84,7 @@
                 </button>
                 <button class="level-card civic-card" onclick="selectLevel('NAT')">
                     <span class="level-badge badge-darkpurple">Niveau B1/B2 • 10 questions</span>
-                    <h3>Quizz Naturalisation</h3>
+                    <h3>Quiz Naturalisation</h3>
                     <p>Test approfondi : Histoire de France, société, institutions et culture générale civique.</p>
                 </button>
             </div>
@@ -123,7 +123,7 @@
         <!-- 3. Écran du Quiz -->
         <div id="quiz-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1 id="quiz-title">Quiz de Français</h1>
             </div>
             <div class="card">
@@ -140,9 +140,11 @@
         <!-- 4. Écran des Résultats -->
         <div id="result-container" class="hidden">
             <div class="header-section">
-                <img src="logo.png" alt="Logo SIDJI Formation" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
+                <img src="logo.png" alt="SIDJI Formation – retour à l'accueil" class="logo-clickable" onclick="resetToHome()" title="Retour à l'accueil">
                 <h1>Bilan &amp; Préconisation de Formation</h1>
             </div>
+
+            <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
 
             <div class="results-grid">
                 <div class="left-column">
@@ -177,6 +179,10 @@
                         <!-- Généré par JS -->
                     </div>
                 </div>
+            </div>
+
+            <div class="actions-group result-actions">
+                <button class="btn" onclick="resetToHome()">Faire un autre test</button>
             </div>
         </div>
     </div>

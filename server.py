@@ -27,6 +27,42 @@ db_config = {
 
 MAX_NOM = 100
 MAX_NIVEAU = 50
+MAX_REPONSES = 100
+MAX_TEXTE_REPONSE = 1000
+
+# Taille maximale d'une requete (evite qu'on envoie des megaoctets de texte)
+app.config["MAX_CONTENT_LENGTH"] = 256 * 1024
+
+# Seuls les modules proposes sur le site sont acceptes
+MODULES_VALIDES = {
+    "GRAMMAR", "READING", "CIVIC_SKILL", "CSP", "CR", "NAT",
+    "A1", "A2", "B1", "B2", "ALL",
+}
+CARACTERES_INTERDITS_NOM = set("<>")
+
+
+def est_entier(valeur):
+    # En Python, True/False sont aussi des int : on les refuse explicitement
+    return isinstance(valeur, int) and not isinstance(valeur, bool)
+
+
+def reponses_valides(reponses):
+    if reponses is None:
+        return True
+    if not isinstance(reponses, list) or len(reponses) > MAX_REPONSES:
+        return False
+    for item in reponses:
+        if not isinstance(item, dict):
+            return False
+        for cle in ("question", "userAns", "correctAns"):
+            val = item.get(cle)
+            if val is not None and (not isinstance(val, str) or len(val) > MAX_TEXTE_REPONSE):
+                return False
+        for cle in ("isCorrect", "isSkipped"):
+            val = item.get(cle)
+            if val is not None and not isinstance(val, bool):
+                return False
+    return True
 
 # Code d'acces a l'interface admin (admin.html) : variable d'environnement ADMIN_CODE
 ADMIN_CODE = os.environ.get("ADMIN_CODE", "")
@@ -56,12 +92,15 @@ def sauvegarder():
     reponses = data.get("reponses")
 
     # Validation minimale des donnees recues
-    if not nom or len(nom) > MAX_NOM:
+    if (not nom or len(nom) > MAX_NOM
+            or any(c in CARACTERES_INTERDITS_NOM or ord(c) < 32 for c in nom)):
         return jsonify({"error": "Nom invalide"}), 400
-    if not niveau or len(niveau) > MAX_NIVEAU:
+    if niveau not in MODULES_VALIDES:
         return jsonify({"error": "Niveau invalide"}), 400
-    if not isinstance(score, int) or not isinstance(total, int) or not (0 <= score <= total <= 100):
+    if not est_entier(score) or not est_entier(total) or not (0 <= score <= total <= 100):
         return jsonify({"error": "Score invalide"}), 400
+    if not reponses_valides(reponses):
+        return jsonify({"error": "Réponses invalides"}), 400
 
     reponses_json = json.dumps(reponses, ensure_ascii=False) if reponses is not None else None
 
